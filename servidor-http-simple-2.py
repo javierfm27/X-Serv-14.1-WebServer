@@ -19,6 +19,7 @@ import socket
 mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Let the port be reused if no process is actually using it
 mySocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#La opcion SO_REUSEADDR -> nos permite reutilizar el puerto
 # Bind to the address corresponding to the main name of the host
 mySocket.bind((socket.gethostname(), 1235))
 
@@ -31,19 +32,20 @@ mySocket.listen(5)
 
 try:
     while True:
-        print 'Waiting for connections'
+        print ('Waiting for connections')
         (recvSocket, address) = mySocket.accept()
-        print 'Request received:'
-        print recvSocket.recv(2048)
-        print 'Answering back...'
+        print ('Request received:')
+        peticion = recvSocket.recv(2048).decode("utf-8","strict")
+        print(peticion.split())
+        print ('Answering back...')
         recvSocket.send("HTTP/1.1 200 OK\r\n\r\n" +
-                        "<html><body><h1>Hello World!</h1>" +
+                        "<!DOCTYPE html> <html><body><h1>Hello World!</h1>" +
                         "<p>And in particular hello to you, " +
-                        str(address[0]) +
+                        address[0] +
                         "</p>" +
                         "</body></html>" +
                         "\r\n")
         recvSocket.close()
 except KeyboardInterrupt:
-    print "Closing binded socket"
+    print ("Closing binded socket")
     mySocket.close()
